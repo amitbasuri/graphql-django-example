@@ -4,6 +4,25 @@ from django.db import models
 from .managers import UserManager
 
 
+class Country(models.Model):
+    id = models.PositiveIntegerField(primary_key=True)
+    name = models.CharField(max_length=50)
+    phone_code = models.CharField(max_length=10, null=True)
+
+
+class State(models.Model):
+    id = models.PositiveIntegerField(primary_key=True)
+    name = models.CharField(max_length=50)
+    country_id = models.ForeignKey(Country, on_delete=models.CASCADE)
+
+
+class City(models.Model):
+    id = models.PositiveIntegerField(primary_key=True)
+    name = models.CharField(max_length=50)
+    country_id = models.ForeignKey(Country, on_delete=models.CASCADE)
+    state_id = models.ForeignKey(State, on_delete=models.CASCADE)
+
+
 class User(AbstractBaseUser):
     username = None
     SKILLS = (
@@ -23,9 +42,9 @@ class User(AbstractBaseUser):
     password = models.CharField(max_length=500)
     profile_image_url = models.URLField()
     gender = models.CharField(max_length=1, choices=GENDERS)
-    country = models.CharField(max_length=30)
-    state = models.CharField(max_length=30)
-    city = models.CharField(max_length=30)
+    country = models.ForeignKey(Country, on_delete=models.CASCADE)
+    state = models.ForeignKey(State, on_delete=models.CASCADE)
+    city = models.ForeignKey(City, on_delete=models.CASCADE)
     contact_number = models.CharField(max_length=30)
     skill = models.CharField(max_length=20, choices=SKILLS)
     date_of_birth = models.DateField()
