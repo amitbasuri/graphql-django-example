@@ -1,29 +1,38 @@
-from django.contrib.auth import get_user_model
-from django.db.models import Q
-
 import graphene
+from django.db.models import Q
 from graphene_django import DjangoObjectType
+
+from .models import User
 
 
 class UserType(DjangoObjectType):
     class Meta:
-        model = get_user_model()
+        model = User
 
 
 class CreateUser(graphene.Mutation):
     user = graphene.Field(UserType)
 
     class Arguments:
-        username = graphene.String(required=True)
         password = graphene.String(required=True)
         email = graphene.String(required=True)
+        profile_image_url = graphene.String(required=False)
+        gender = graphene.String(required=True)
+        country = graphene.String(required=True)
+        state = graphene.String(required=True)
+        city = graphene.String(required=True)
+        contact_number = graphene.String(required=True)
+        skill = graphene.String(required=True)
+        date_of_birth = graphene.Date(required=True)
 
-    def mutate(self, info, username, password, email):
-        user = get_user_model()(
-            username=username,
+    def mutate(self, info, password, email, **kwargs):
+        user = User(
             email=email,
+            **kwargs
         )
+
         user.set_password(password)
+        user.full_clean()
         user.save()
 
         return CreateUser(user=user)
@@ -45,11 +54,10 @@ class Query(graphene.ObjectType):
         user = info.context.user
         if user.is_anonymous:
             raise Exception('Not logged in!')
-        qs = get_user_model().objects.all()
+        qs = User.objects.all()
         if search:
             filter = (
-                    Q(email__icontains=search) |
-                    Q(username__icontains=search)
+                Q(email__icontains=search)
             )
             qs = qs.filter(filter)
 
