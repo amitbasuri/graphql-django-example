@@ -1,7 +1,7 @@
 aniso8601==7.0.0
 Django==2.2.24
 django-environ==0.4.5
-django-filter==2.0.0
+django-filter==2.4.0
 django-graphql-jwt==0.1.5
 graphene==2.1.8
 graphene-django==2.2.0
